@@ -36,17 +36,11 @@ json-server --watch- db.json
 
 const bookList = document.getElementById("book-list");
 
-const booksRequest = fetch("http://localhost:3000/books");
+const booksRequest = axios.get("http://localhost:3000/books");
 
 booksRequest
-    .then(response => {
-        if(!response.ok){
-            throw new Error("Список книг временно недоступен")
-        }
-        return response.json()
-    })
-    .then(result => {
-        const booksElements = result.map(createBookRow);
+    .then(({data}) => {
+        const booksElements = data.map(createBookRow);
         // console.log(result)
         // console.log(booksElements)
         bookList.append(...booksElements)
@@ -100,25 +94,12 @@ bookAddForm.addEventListener("submit", function(e){
         isbn
     };
 
-    const body = JSON.stringify(book);
-    const bookAddRequest = fetch("http://localhost:3000/books", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-        },
-        body
-    });
+    const bookAddRequest = axios.post("http://localhost:3000/books", book);
     
     bookAddRequest
-        .then(response => {
-            if(!response.ok){
-                throw new Error("Добавление не удалось")
-            }
-            return response.json()
-        })
-        .then(result => {
-            if(result.id){
-                const row = createBookRow(result);
+        .then(({data}) => {
+            if(data.id){
+                const row = createBookRow(data);
                 bookList.append(row)
             }
         })
